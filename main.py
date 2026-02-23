@@ -1,4 +1,3 @@
-import argparse
 import datetime
 import os
 import re
@@ -21,20 +20,30 @@ def validate_env():
         sys.exit(1)
 
 
-def parse_args() -> list[str]:
-    parser = argparse.ArgumentParser(
-        description="Search Google for ETF news and email the top 5 results."
-    )
-    parser.add_argument(
-        "ticker",
-        help="ETF ticker symbol(s), e.g. SPY or SPY,QQQ,VTI",
-    )
-    args = parser.parse_args()
-    tickers = [t.strip().upper() for t in args.ticker.split(",")]
-    for t in tickers:
-        if not re.match(r"^[A-Z]{1,5}$", t):
-            print(f"Error: '{t}' is not a valid ETF ticker (1-5 uppercase letters).")
-            sys.exit(1)
+TICKER_FILE = os.path.join(os.path.dirname(__file__), "tickers.txt")
+
+
+def load_tickers() -> list[str]:
+    if not os.path.exists(TICKER_FILE):
+        print(f"Error: Ticker file not found: {TICKER_FILE}")
+        print("Create a tickers.txt file with one ticker per line.")
+        sys.exit(1)
+
+    tickers = []
+    with open(TICKER_FILE) as f:
+        for line in f:
+            t = line.strip().upper()
+            if not t or t.startswith("#"):
+                continue
+            if not re.match(r"^[A-Z]{1,5}$", t):
+                print(f"Error: '{t}' in tickers.txt is not a valid ticker (1-5 uppercase letters).")
+                sys.exit(1)
+            tickers.append(t)
+
+    if not tickers:
+        print("Error: tickers.txt is empty. Add at least one ticker symbol.")
+        sys.exit(1)
+
     return tickers
 
 
@@ -132,7 +141,7 @@ def send_email(subject: str, plain: str, html: str):
 def main():
     load_dotenv()
     validate_env()
-    tickers = parse_args()
+    tickers = load_tickers()
     for ticker in tickers:
         print(f"Searching for {ticker} ETF news...")
         results = search_etf_news(ticker)

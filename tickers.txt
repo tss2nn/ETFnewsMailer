@@ -1,0 +1,5 @@
+# Add one ETF ticker per line. Lines starting with # are ignored.
+SPY
+QQQ
+JEDI
+SCHD
