@@ -26,13 +26,13 @@ To generate a Gmail App Password: **Google Account → Security → 2-Step Verif
 
 ## Usage
 
-```bash
-# Single ticker
-python main.py SPY
+Add your ETF tickers to `tickers.txt` (one per line, `#` for comments), then run:
 
-# Multiple tickers (one email per ticker)
-python main.py SPY,QQQ,VTI
+```bash
+python main.py
 ```
+
+One email is sent per ticker.
 
 ## Scheduling (macOS/Linux)
 
